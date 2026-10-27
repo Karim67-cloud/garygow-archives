@@ -1,0 +1,36 @@
+# Met à jour les archives après chaque tirage et les publie (GitHub Pages).
+# Passage toutes les 3 heures, tous les jours : cela couvre chaque tirage (2 à 3 par semaine et par jeu)
+# sans dépendre d'un jour précis. Les fichiers publiés : <adresse Pages>/history-50-2.json et history-49-1.json.
+name: update-history
+on:
+  schedule:
+    - cron: "15 */3 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/update_history.py --out history
+      - name: Garder l'archive dans le dépôt si elle a changé
+        run: |
+          git config user.name "garygow-bot"
+          git config user.email "garygow-bot@users.noreply.github.com"
+          git add history
+          git diff --cached --quiet || (git commit -m "Mise à jour des archives" && git push)
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: history
+      - id: deploy
+        uses: actions/deploy-pages@v4
