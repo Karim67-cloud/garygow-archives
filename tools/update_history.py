@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Met à jour les archives de GARYGOW à partir des fichiers de résultats officiels.
+"""Met à jour les archives de GARYGOW à partir des fichiers de résultats publiés.
 
 Sorties : history/history-50-2.json (50 numéros + 2 étoiles) et history/history-49-1.json (49 numéros + 1 étoile),
 du tirage le plus récent au plus ancien :  {"game":..., "updated":"AAAA-MM-JJ", "draws":[{"d":"AAAA-MM-JJ","n":[...],"s":[...]}]}
 
 Sources (tools/sources.json) : pour chaque jeu, une liste d'adresses (CSV ou ZIP de CSV) ou de fichiers locaux.
-Le programme lit les CSV FDJ et les CSV « une ligne par tirage » : il reconnaît les colonnes de date, de boules,
+Le programme lit les CSV de résultats « une ligne par tirage » : il reconnaît les colonnes de date, de boules,
 d'étoiles et de numéro chance par leur nom (boule_1..boule_5, etoile_1, etoile_2, numero_chance, star_1…).
 Chaque tirage est contrôlé (5 numéros distincts, étoiles dans les bornes) ; les lignes invalides sont comptées et
 signalées, jamais écrites. Si le résultat est vide ou plus petit que l'archive déjà publiée, l'ancienne est conservée.
@@ -56,7 +56,7 @@ def draws_from_rows(rows, key, stats):
     if not dcol:
         stats["unrecognised"] += 1
         return []
-    # Un tableau peut contenir un 2e tirage par ligne (Loto depuis 2019 : colonnes « …_second_tirage »).
+    # Un tableau peut contenir un 2e tirage par ligne (jeu 49 + 1 depuis 2019 : colonnes « …_second_tirage »).
     def is2(h):
         return "second" in h or "2eme" in h or "2e_tirage" in h
     out, found = [], False
